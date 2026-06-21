@@ -1,0 +1,64 @@
+﻿@model FitnessClubManagement.Models.Workout
+@{
+    ViewData["Title"] = "Session Roster";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+            <h2 class="fw-bold text-uppercase m-0">@Model.Title <span class="text-secondary">ROSTER</span></h2>
+            <div class="text-white-50 mt-1">
+                <span class="badge bg-dark border border-secondary text-white me-2">
+                    @Model.Bookings.Count / @Model.Capacity BOOKED
+                </span>
+                @Model.ScheduledTime.ToString("MMMM dd, yyyy | HH:mm")
+            </div>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-secondary text-nowrap" style="border-radius: 100px;">
+            ← RETURN TO DASHBOARD
+        </a>
+    </div>
+
+    <div class="glass-panel p-0 overflow-hidden">
+        @if (!Model.Bookings.Any())
+        {
+            <div class="text-center p-5">
+                <h4 class="text-secondary">NO FIGHTERS REGISTERED</h4>
+                <p class="text-white-50 m-0">The roster for this session is currently empty.</p>
+            </div>
+        }
+        else
+        {
+            <table class="table table-dark table-hover mb-0" style="background: transparent;">
+                <thead style="background: rgba(255, 255, 255, 0.05);">
+                    <tr>
+                        <th class="p-4 text-secondary text-uppercase small">Fighter Name</th>
+                        <th class="p-4 text-secondary text-uppercase small">Contact Email</th>
+                        <th class="p-4 text-secondary text-uppercase small text-end">Booking Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var booking in Model.Bookings.OrderBy(b => b.BookingDate))
+                    {
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                            <td class="p-4 align-middle fw-bold text-white">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="panel-icon m-0" style="width: 35px; height: 35px; font-size: 1rem; border-radius: 10px;">👤</div>
+                                    @booking.User?.Username
+                                </div>
+                            </td>
+                            <td class="p-4 align-middle text-white-50">
+                                <a href="mailto:@booking.User?.Email" class="text-info text-decoration-none">
+                                    @booking.User?.Email
+                                </a>
+                            </td>
+                            <td class="p-4 align-middle text-white-50 text-end">
+                                @(booking.BookingDate?.ToString("MMM dd, HH:mm") ?? "N/A")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

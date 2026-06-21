@@ -19,18 +19,34 @@ namespace FitnessClubManagement.Controllers
         }
 
         // GET: /Trainer/Index
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string filter = "active")
         {
-            // Securely get the logged-in trainer's name
             var trainerName = User.Identity?.Name;
+            var now = DateTime.Now;
 
-            // Fetch only the workouts created by this specific trainer
-            // .Include(w => w.Bookings) allows us to count how many people have booked
-            var myWorkouts = await _context.Workouts
+            // Базова заявка за тренировките на текущия треньор
+            var query = _context.Workouts
                 .Include(w => w.Bookings)
-                .Where(w => w.TrainerName == trainerName)
-                .OrderBy(w => w.ScheduledTime)
+                .Where(w => w.TrainerName == trainerName);
+
+            // Прилагане на филтър в зависимост от избора
+            if (filter == "active")
+            {
+                query = query.Where(w => w.ScheduledTime >= now);
+            }
+            else if (filter == "expired")
+            {
+                query = query.Where(w => w.ScheduledTime < now);
+            }
+
+            // Сортиране: Първо активните (бъдещи) тренировки, след това по хронологичен ред
+            var myWorkouts = await query
+                .OrderByDescending(w => w.ScheduledTime >= now) // True (активни) отиват най-отгоре
+                .ThenBy(w => w.ScheduledTime)                  // След това сортираме по време
                 .ToListAsync();
+
+            // Запазваме текущия филтър във ViewBag, за да го визуализираме в изгледа
+            ViewBag.CurrentFilter = filter;
 
             return View(myWorkouts);
         }
@@ -64,6 +80,26 @@ namespace FitnessClubManagement.Controllers
             }
 
             return View(model);
+        }
+
+        // GET: /Trainer/Roster/5
+        public async Task<IActionResult> Roster(int id)
+        {
+            var trainerName = User.Identity?.Name;
+
+            // Fetch the workout, include the bookings, and THEN include the User for each booking
+            var workout = await _context.Workouts
+                .Include(w => w.Bookings)
+                    .ThenInclude(b => b.User)
+                .FirstOrDefaultAsync(w => w.Id == id && w.TrainerName == trainerName);
+
+            // Security check: Ensure the workout exists and belongs to this specific trainer
+            if (workout == null)
+            {
+                return NotFound();
+            }
+
+            return View(workout);
         }
     }
 }

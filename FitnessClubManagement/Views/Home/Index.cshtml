@@ -1,69 +1,102 @@
 ﻿@{
-    ViewData["Title"] = "Liquid Dashboard";
+    ViewData["Title"] = "Nexus Combat";
 }
 
-<div class="container text-center mb-5 pb-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <h1 class="hero-title mb-4 text-uppercase">Forge Your<br>Ultimate Self</h1>
-            <p class="hero-subtitle mb-5">
-                A fluid digital environment running on glass-morphic architecture. Synchronize your combative training, track macros, and master your performance.
-            </p>
-            <a href="#" class="btn btn-liquid-primary text-uppercase">Initialize Access</a>
+<div class="hero-wrapper tactical-grid">
+    <div class="container position-relative z-1">
+        <div class="row">
+            <div class="col-lg-10">
+                <span class="status-badge active mb-4">Elite Training Facility</span>
+
+                <h1 class="hero-headline">
+                    BLOOD.<br>
+                    SWEAT.<br>
+                    <span class="text-red">RESPECT.</span>
+                </h1>
+
+                <p class="text-gray mb-5" style="max-width: 600px; font-size: 1.15rem; line-height: 1.7;">
+                    No gimmicks. Just raw discipline and elite instruction. Step onto the mats, master your striking and grappling, and forge a better version of yourself.
+                </p>
+
+                <div class="d-flex flex-wrap gap-3">
+                    <a asp-controller="Home" asp-action="Schedule" class="btn-combat">
+                        VIEW SCHEDULE
+                    </a>
+                    @if (User.Identity == null || !User.Identity.IsAuthenticated)
+                    {
+                        <a asp-controller="Account" asp-action="Register" class="btn-combat-outline bg-dark">
+                            JOIN THE ROSTER
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="User" asp-action="Dashboard" class="btn-combat-outline bg-dark">
+                            MY DASHBOARD
+                        </a>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="container mt-5">
-    <div class="row g-4">
+<div class="bg-alt-section py-5">
+    <div class="watermark-text">DOMINATE</div>
 
-        <!-- PANEL 1: SPARRING (Широк изцяло течен премиум панел) -->
-        <div class="col-12">
-            <div class="glass-panel d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4">
-                <div style="max-width: 750px;">
-                    <div class="panel-icon">🥊</div>
-                    <h3 class="mb-3">Advanced Sparring Matchmaking</h3>
-                    <p>
-                        Skip the friction of finding elite training partners. Define your fighting style, accurate weight class, and combat experience. The platform instantly charts compatible athletes inside your club for coordinated, safe, and tactical open sparring.
-                    </p>
-                </div>
-                <div class="text-md-end flex-shrink-0">
-                    <span class="glass-tag text-uppercase">Engine Active</span>
-                </div>
+    <div class="container py-5 position-relative z-1">
+        <div class="row align-items-end mb-5">
+            <div class="col-lg-8">
+                <h2 class="fw-bold text-uppercase mb-0" style="font-size: 3rem; letter-spacing: -1px;">Our Disciplines</h2>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <p class="text-gray mb-0" style="font-size: 1.1rem;">Select your weapon. Train with professionals.</p>
             </div>
         </div>
 
-        <!-- PANEL 2: NUTRITION -->
-        <div class="col-md-6">
-            <div class="glass-panel h-100 d-flex flex-column justify-content-between">
-                <div>
-                    <div class="panel-icon">🥩</div>
-                    <h3 class="mb-3">Hydration & Macro System</h3>
-                    <p>
-                        Automated structural allocation for your nutrient goals. Inputs are calculated directly against your real-time body mass updates to maintain peak physical output.
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="combat-card bg-black">
+                    <div class="combat-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1V2zm1 12h2V2h-2v12zm-3 0V7H7v7h2zm-5 0v-3H2v3h2z" />
+                        </svg>
+                    </div>
+                    <h3 class="combat-card-title">Mixed Martial Arts</h3>
+                    <p class="text-gray">
+                        The ultimate proving ground. Seamlessly transition between elite striking, wrestling, and ground submissions in our comprehensive MMA program.
                     </p>
                 </div>
-                <div class="mt-4 pt-2">
-                    <span class="text-white-50 small">✓ Real-time sync operational</span>
+            </div>
+
+            <div class="col-md-4">
+                <div class="combat-card bg-black">
+                    <div class="combat-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3.5a.5.5 0 0 1-.5-.5v-3A.5.5 0 0 1 8 4z" />
+                        </svg>
+                    </div>
+                    <h3 class="combat-card-title">Boxing & Striking</h3>
+                    <p class="text-gray">
+                        Master the sweet science. High-volume pad work, heavy bag conditioning, and tactical sparring designed for knockout precision and footwork.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="combat-card bg-black">
+                    <div class="combat-card-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M5.5 9.511c.076.954.83 1.697 2.182 1.785V12h.6v-.709c1.4-.098 2.218-.846 2.218-1.932 0-.987-.626-1.496-1.745-1.76l-.473-.112V5.57c.6.068.982.396 1.074.85h1.052c-.076-.919-.864-1.638-2.126-1.716V4h-.6v.719c-1.195.117-2.01.836-2.01 1.853 0 .9.606 1.472 1.613 1.707l.397.098v2.034c-.615-.093-1.022-.43-1.114-.9H5.5zm2.177-2.166c-.59-.137-.91-.416-.91-.836 0-.47.345-.822.915-.925v1.76h-.005zm.692 1.193c.717.166 1.048.435 1.048.91 0 .542-.412.914-1.135.982V8.518l.087.02z" />
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                        </svg>
+                    </div>
+                    <h3 class="combat-card-title">Strength & Conditioning</h3>
+                    <p class="text-gray">
+                        Build explosive power. Structured Upper/Lower splits, strict macro tracking, and functional fitness to ensure peak physical output on the mats.
+                    </p>
                 </div>
             </div>
         </div>
-
-        <!-- PANEL 3: SCHEDULE -->
-        <div class="col-md-6">
-            <div class="glass-panel h-100 d-flex flex-column justify-content-between">
-                <div>
-                    <div class="panel-icon">📅</div>
-                    <h3 class="mb-3">Intelligent Session Booking</h3>
-                    <p>
-                        High-velocity queue architecture for combat and conditioning classes. Secure slots for MMA, Boxing, and CrossFit with instant capacity notifications.
-                    </p>
-                </div>
-                <div class="mt-4 pt-2">
-                    <span class="text-white-50 small">✓ WebSockets tracking active</span>
-                </div>
-            </div>
-        </div>
-
     </div>
 </div>

@@ -1,13 +1,32 @@
 ﻿@model IEnumerable<FitnessClubManagement.Models.Workout>
 @{
     ViewData["Title"] = "Trainer Command Center";
+    var currentFilter = ViewBag.CurrentFilter as string ?? "active";
 }
 
 <div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <h2 class="fw-bold text-uppercase m-0">ACTIVE SESSIONS</h2>
         <a asp-action="AddWorkout" class="btn btn-liquid-primary text-uppercase">
             + DEPLOY NEW SESSION
+        </a>
+    </div>
+
+    <div class="d-flex gap-2 mb-4 flex-wrap p-2" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 100px; width: fit-content;">
+        <a asp-action="Index" asp-route-filter="active"
+           class="btn btn-sm px-4"
+           style="border-radius: 100px; transition: all 0.3s; @(currentFilter == "active" ? "background: var(--accent-liquid); color: #fff; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);" : "color: #aaa; background: transparent; border: none;")">
+            ACTIVE
+        </a>
+        <a asp-action="Index" asp-route-filter="expired"
+           class="btn btn-sm px-4"
+           style="border-radius: 100px; transition: all 0.3s; @(currentFilter == "expired" ? "background: var(--accent-liquid); color: #fff; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);" : "color: #aaa; background: transparent; border: none;")">
+            COMPLETED
+        </a>
+        <a asp-action="Index" asp-route-filter="all"
+           class="btn btn-sm px-4"
+           style="border-radius: 100px; transition: all 0.3s; @(currentFilter == "all" ? "background: var(--accent-liquid); color: #fff; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);" : "color: #aaa; background: transparent; border: none;")">
+            ALL SESSIONS
         </a>
     </div>
 
@@ -23,16 +42,24 @@
         <div class="row g-4">
             @foreach (var workout in Model)
             {
-                // Calculate how many spots are left dynamically
+                // Calculate dynamic states
                 int currentBookings = workout.Bookings.Count;
                 bool isFull = currentBookings >= workout.Capacity;
+                bool isPast = workout.ScheduledTime < DateTime.Now; // NEW: Check if the session is over
 
                 <div class="col-md-4">
-                    <div class="glass-panel h-100 d-flex flex-column justify-content-between p-4" style="@(isFull ? "border-color: rgba(220, 53, 69, 0.5);" : "")">
+                    <div class="glass-panel h-100 d-flex flex-column justify-content-between p-4"
+                         style="@(isPast ? "opacity: 0.6; filter: grayscale(50%);" : (isFull ? "border-color: rgba(220, 53, 69, 0.5);" : ""))">
+
                         <div>
                             <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
                                 <h4 class="fw-bold text-white text-uppercase m-0">@workout.Title</h4>
-                                @if (isFull)
+
+                                @if (isPast)
+                                {
+                                    <span class="badge bg-secondary rounded-pill">COMPLETED</span>
+                                }
+                                else if (isFull)
                                 {
                                     <span class="badge bg-danger rounded-pill">MAX CAPACITY</span>
                                 }
@@ -53,16 +80,21 @@
                         <div class="mt-auto border-top pt-3" style="border-color: rgba(255, 255, 255, 0.05) !important;">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="text-white-50 small">ROSTER CAPACITY</span>
-                                <span class="fw-bold @(isFull ? "text-danger" : "text-white")">
+                                <span class="fw-bold @(isPast ? "text-secondary" : (isFull ? "text-danger" : "text-white"))">
                                     @currentBookings / @workout.Capacity
                                 </span>
                             </div>
-                            <div class="progress mt-2" style="height: 6px; background: rgba(255,255,255,0.05);">
-                                <div class="progress-bar @(isFull ? "bg-danger" : "bg-info")"
+
+                            <div class="progress mt-2 mb-3" style="height: 6px; background: rgba(255,255,255,0.05);">
+                                <div class="progress-bar @(isPast ? "bg-secondary" : (isFull ? "bg-danger" : "bg-info"))"
                                      role="progressbar"
                                      style="width: @((currentBookings * 100) / workout.Capacity)%;">
                                 </div>
                             </div>
+
+                            <a asp-action="Roster" asp-route-id="@workout.Id" class="btn btn-sm w-100" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff; border-radius: 8px;">
+                                VIEW ROSTER
+                            </a>
                         </div>
                     </div>
                 </div>

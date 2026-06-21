@@ -3,78 +3,80 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Nexus Fit</title>
+    <title>@ViewData["Title"] - Nexus Combat</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
-    <div class="liquid-bg">
-        <div class="liquid-blob blob-purple"></div>
-        <div class="liquid-blob blob-blue"></div>
-        <div class="liquid-blob blob-pink"></div>
-    </div>
 
-    <header class="fixed-top d-flex justify-content-center pt-4">
-        <nav class="navbar navbar-expand-md liquid-nav container">
-            <a class="navbar-brand fw-extrabold" asp-controller="Home" asp-action="Index">
-                NEXUS<span class="glass-dot">.</span>FIT
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
-                <ul class="navbar-nav mx-auto gap-4">
-                    <li class="nav-item"><a class="nav-link active" asp-controller="Home" asp-action="Index">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Schedule">Schedule</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Sparring</a></li>
-                </ul>
-                <div class="nav-auth d-flex align-items-center gap-3">
-                    @if (User.Identity != null && User.Identity.IsAuthenticated)
-                    {
-                        @if (User.IsInRole("Admin"))
+    <header>
+        <nav class="navbar navbar-expand-md">
+            <div class="container">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    NEXUS<span>COMBAT</span>
+                </a>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+                </button>
+
+                <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+                    <ul class="navbar-nav mx-auto gap-4">
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Schedule">Schedule</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Sparring</a></li>
+                    </ul>
+
+                    <div class="nav-auth d-flex align-items-center gap-3 mt-3 mt-md-0">
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            <a asp-controller="Admin" asp-action="Index" class="nav-link text-warning fw-bold">Admin Panel</a>
-                        }
-                        else if (User.IsInRole("Trainer"))
-                        {
-                            <a asp-controller="Trainer" asp-action="Index" class="nav-link text-info fw-bold text-nowrap">Trainer Dashboard</a>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a asp-controller="Admin" asp-action="Index" class="nav-link text-warning fw-bold">SYS ADMIN</a>
+                            }
+                            else if (User.IsInRole("Trainer"))
+                            {
+                                <a asp-controller="Trainer" asp-action="Index" class="nav-link text-danger fw-bold text-nowrap">TRAINER HQ</a>
+                            }
+                            else
+                            {
+                                <a asp-controller="User" asp-action="Dashboard" class="nav-link text-white fw-bold text-nowrap">MY ROSTER</a>
+                            }
+
+                            <a asp-controller="Account" asp-action="Logout" class="btn-combat-outline" style="padding: 0.5rem 1.5rem; font-size: 0.8rem;">
+                                LOGOUT
+                            </a>
                         }
                         else
                         {
-                            <a asp-controller="User" asp-action="Dashboard" class="nav-link text-white fw-bold text-nowrap">My Dashboard</a>
+                            <a asp-controller="Account" asp-action="Login" class="btn-combat" style="padding: 0.5rem 1.5rem; font-size: 0.8rem;">
+                                LOGIN
+                            </a>
                         }
-
-                        <a asp-controller="Account" asp-action="Logout" class="btn btn-outline-danger btn-sm" style="border-radius: 50px;">
-                            LOGOUT
-                        </a>
-                    }
-                    else
-                    {
-                        <a asp-controller="Account" asp-action="Login" class="btn btn-liquid-pill">LOGIN</a>
-                    }
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
 
-    <div class="main-container">
-        <main role="main">
-            @RenderBody()
-        </main>
-    </div>
+    <main role="main">
+        @RenderBody()
+    </main>
 
-    <footer class="liquid-footer text-center">
+    <footer class="text-center py-5 mt-5" style="border-top: 1px solid var(--border-color);">
         <div class="container">
-            <span class="footer-brand">NEXUS.FIT</span> &copy; 2026 // Liquid Glass Architecture
+            <span style="color: var(--text-muted); font-weight: 800; letter-spacing: 1px;">NEXUS<span style="color: var(--accent-red);">COMBAT</span></span>
+            <br />
+            <span style="color: var(--border-color); font-size: 0.85rem; font-weight: 600;">EST. 2026 // ELITE TRAINING SYSTEMS</span>
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
         setTimeout(function () {
@@ -84,9 +86,9 @@
         alert.style.opacity = "0";
         setTimeout(function () {
         alert.remove();
-        }, 500); // Removes the element completely after the fade-out animation
+        }, 500);
         });
-        }, 2000); // 2000 milliseconds = 2 seconds
+        }, 2000);
         });
     </script>
 </body>
