@@ -1,0 +1,41 @@
+﻿@model FitnessClubManagement.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="glass-panel" style="width: 100%; max-width: 400px;">
+        <h2 class="text-center mb-4 fw-bold">SYSTEM ACCESS</h2>
+
+        @if (!ViewData.ModelState.IsValid && ViewData.ModelState[""] != null && ViewData.ModelState[""].Errors.Count > 0)
+        {
+            <div class="alert alert-danger" style="background: rgba(220, 53, 69, 0.2); border: 1px solid rgba(220, 53, 69, 0.4); color: #ff6b6b;">
+                @Html.ValidationSummary(true, "")
+            </div>
+        }
+
+        <form asp-action="Login" method="post">
+            <div class="mb-3">
+                <label class="text-secondary small mb-1">SECURE EMAIL</label>
+                <input asp-for="Email" class="form-control bg-dark text-white border-secondary" style="border-radius: 12px; padding: 12px;" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+            <div class="mb-4">
+                <label class="text-secondary small mb-1">PASSWORD</label>
+                <input asp-for="Password" class="form-control bg-dark text-white border-secondary" style="border-radius: 12px; padding: 12px;" />
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+            <button type="submit" class="btn btn-liquid-primary w-100 mb-3">ENTER NEXUS</button>
+            <div class="text-center">
+                <span class="text-secondary small">No access codes?</span>
+                <a asp-action="Register" class="text-white text-decoration-none fw-bold small">Register here</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

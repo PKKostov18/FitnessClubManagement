@@ -1,0 +1,41 @@
+﻿@model FitnessClubManagement.ViewModels.AddWorkoutViewModel
+@{
+    ViewData["Title"] = "Deploy Session";
+}
+
+<div class="container d-flex justify-content-center align-items-center mt-5" style="min-height: 60vh;">
+    <div class="glass-panel" style="width: 100%; max-width: 500px;">
+        <h3 class="text-center mb-4 fw-bold text-uppercase">DEPLOY NEW SESSION</h3>
+
+        <form asp-action="AddWorkout" method="post">
+            <div class="mb-3">
+                <label class="text-secondary small mb-1">COMBAT DISCIPLINE / CLASS NAME</label>
+                <input asp-for="Title" class="form-control bg-dark text-white border-secondary" placeholder="e.g. Brazilian Jiu-Jitsu, Muay Thai" style="border-radius: 12px; padding: 12px;" />
+                <span asp-validation-for="Title" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="text-secondary small mb-1">SCHEDULED DATE & TIME</label>
+                <input asp-for="ScheduledTime" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local" class="form-control bg-dark text-white border-secondary" style="border-radius: 12px; padding: 12px;" />
+                <span asp-validation-for="ScheduledTime" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-4">
+                <label class="text-secondary small mb-1">MAXIMUM FIGHTER CAPACITY</label>
+                <input asp-for="Capacity" type="number" min="1" max="50" class="form-control bg-dark text-white border-secondary" style="border-radius: 12px; padding: 12px;" />
+                <span asp-validation-for="Capacity" class="text-danger small"></span>
+            </div>
+
+            <div class="d-flex gap-3">
+                <a asp-action="Index" class="btn btn-outline-secondary w-50" style="border-radius: 100px; padding: 12px;">CANCEL</a>
+                <button type="submit" class="btn btn-liquid-primary w-50">INITIALIZE</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

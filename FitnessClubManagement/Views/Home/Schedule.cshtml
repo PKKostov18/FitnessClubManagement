@@ -1,0 +1,82 @@
+﻿@model IEnumerable<FitnessClubManagement.Models.Workout>
+@using System.Security.Claims
+@{
+    ViewData["Title"] = "Global Schedule";
+}
+
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-uppercase m-0 hero-title" style="font-size: 3rem;">GLOBAL SCHEDULE</h2>
+        <p class="text-secondary">Secure your spot in the upcoming combat and conditioning sessions.</p>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger" style="background: rgba(220, 53, 69, 0.2); border: 1px solid rgba(220, 53, 69, 0.4); color: #ff6b6b;">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="row g-4">
+        @foreach (var workout in Model)
+        {
+            int currentBookings = workout.Bookings.Count;
+            bool isFull = currentBookings >= workout.Capacity;
+
+            <div class="col-md-4">
+                <div class="glass-panel h-100 d-flex flex-column justify-content-between p-4" style="@(isFull ? "opacity: 0.7;" : "")">
+                    <div>
+                        <h4 class="fw-bold text-white text-uppercase mb-2">@workout.Title</h4>
+                        <div class="text-secondary small mb-3">TRAINER: <span class="text-white">@workout.TrainerName</span></div>
+
+                        <div class="mb-2 text-secondary"><strong>DATE:</strong> @workout.ScheduledTime.ToString("MMM dd, yyyy")</div>
+                        <div class="mb-4 text-secondary"><strong>TIME:</strong> @workout.ScheduledTime.ToString("HH:mm")</div>
+                    </div>
+
+                    <div class="mt-auto border-top pt-3" style="border-color: rgba(255, 255, 255, 0.05) !important;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-white-50 small">CAPACITY</span>
+                            <span class="fw-bold @(isFull ? "text-danger" : "text-white")">@currentBookings / @workout.Capacity</span>
+                        </div>
+
+                        @{
+                            // Вземаме списъка с ID-та от контролера
+                            var userBookings = ViewBag.UserBookings as List<int> ?? new List<int>();
+                            bool hasUserBooked = userBookings.Contains(workout.Id);
+
+                            // Намираме конкретното ID на резервацията (ако иска да я отмени)
+                            int? currentBookingId = workout.Bookings.FirstOrDefault(b => b.UserId.ToString() == User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier))?.Id;
+                        }
+
+                        @if (hasUserBooked)
+                        {
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-secondary w-50" disabled style="opacity: 0.7;">BOOKED</button>
+
+                                <form asp-controller="User" asp-action="CancelBooking" method="post" class="w-50">
+                                    <input type="hidden" name="bookingId" value="@currentBookingId" />
+                                    <button type="submit" class="btn btn-outline-danger w-100">CANCEL</button>
+                                </form>
+                            </div>
+                        }
+                        else if (isFull)
+                        {
+                            <button class="btn btn-outline-danger w-100" disabled>MAX CAPACITY</button>
+                        }
+                        else if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <form asp-controller="User" asp-action="BookSession" method="post">
+                                <input type="hidden" name="workoutId" value="@workout.Id" />
+                                <button type="submit" class="btn btn-liquid-primary w-100">BOOK SPOT</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary w-100">LOGIN TO BOOK</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

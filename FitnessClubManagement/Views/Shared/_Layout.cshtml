@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
-    <!-- Органични течни елементи във фона (Liquid Glass Base) -->
     <div class="liquid-bg">
         <div class="liquid-blob blob-purple"></div>
         <div class="liquid-blob blob-blue"></div>
@@ -29,11 +28,33 @@
             <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
                 <ul class="navbar-nav mx-auto gap-4">
                     <li class="nav-item"><a class="nav-link active" asp-controller="Home" asp-action="Index">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Schedule</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Schedule">Schedule</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Sparring</a></li>
                 </ul>
-                <div class="nav-auth">
-                    <a href="#" class="btn btn-liquid-pill">Login</a>
+                <div class="nav-auth d-flex align-items-center gap-3">
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-controller="Admin" asp-action="Index" class="nav-link text-warning fw-bold">Admin Panel</a>
+                        }
+                        else if (User.IsInRole("Trainer"))
+                        {
+                            <a asp-controller="Trainer" asp-action="Index" class="nav-link text-info fw-bold text-nowrap">Trainer Dashboard</a>
+                        }
+                        else
+                        {
+                            <a asp-controller="User" asp-action="Dashboard" class="nav-link text-white fw-bold text-nowrap">My Dashboard</a>
+                        }
+
+                        <a asp-controller="Account" asp-action="Logout" class="btn btn-outline-danger btn-sm" style="border-radius: 50px;">
+                            LOGOUT
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-liquid-pill">LOGIN</a>
+                    }
                 </div>
             </div>
         </nav>
@@ -54,5 +75,19 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(function () {
+        var activeAlerts = document.querySelectorAll('.alert');
+        activeAlerts.forEach(function (alert) {
+        alert.style.transition = "opacity 0.5s ease";
+        alert.style.opacity = "0";
+        setTimeout(function () {
+        alert.remove();
+        }, 500); // Removes the element completely after the fade-out animation
+        });
+        }, 2000); // 2000 milliseconds = 2 seconds
+        });
+    </script>
 </body>
 </html>

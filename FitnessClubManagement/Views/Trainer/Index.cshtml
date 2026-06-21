@@ -1,0 +1,72 @@
+﻿@model IEnumerable<FitnessClubManagement.Models.Workout>
+@{
+    ViewData["Title"] = "Trainer Command Center";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-uppercase m-0">ACTIVE SESSIONS</h2>
+        <a asp-action="AddWorkout" class="btn btn-liquid-primary text-uppercase">
+            + DEPLOY NEW SESSION
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="glass-panel text-center p-5">
+            <h4 class="text-secondary">NO ACTIVE SESSIONS FOUND</h4>
+            <p class="text-white-50">You have not scheduled any combat or conditioning classes yet.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var workout in Model)
+            {
+                // Calculate how many spots are left dynamically
+                int currentBookings = workout.Bookings.Count;
+                bool isFull = currentBookings >= workout.Capacity;
+
+                <div class="col-md-4">
+                    <div class="glass-panel h-100 d-flex flex-column justify-content-between p-4" style="@(isFull ? "border-color: rgba(220, 53, 69, 0.5);" : "")">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                                <h4 class="fw-bold text-white text-uppercase m-0">@workout.Title</h4>
+                                @if (isFull)
+                                {
+                                    <span class="badge bg-danger rounded-pill">MAX CAPACITY</span>
+                                }
+                                else
+                                {
+                                    <span class="badge rounded-pill" style="background: rgba(168, 85, 247, 0.2); color: #a855f7;">ACCEPTING FIGHTERS</span>
+                                }
+                            </div>
+
+                            <div class="mb-2 text-secondary">
+                                <strong>DATE:</strong> @workout.ScheduledTime.ToString("MMM dd, yyyy")
+                            </div>
+                            <div class="mb-4 text-secondary">
+                                <strong>TIME:</strong> @workout.ScheduledTime.ToString("HH:mm")
+                            </div>
+                        </div>
+
+                        <div class="mt-auto border-top pt-3" style="border-color: rgba(255, 255, 255, 0.05) !important;">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-white-50 small">ROSTER CAPACITY</span>
+                                <span class="fw-bold @(isFull ? "text-danger" : "text-white")">
+                                    @currentBookings / @workout.Capacity
+                                </span>
+                            </div>
+                            <div class="progress mt-2" style="height: 6px; background: rgba(255,255,255,0.05);">
+                                <div class="progress-bar @(isFull ? "bg-danger" : "bg-info")"
+                                     role="progressbar"
+                                     style="width: @((currentBookings * 100) / workout.Capacity)%;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

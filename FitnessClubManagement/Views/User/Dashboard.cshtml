@@ -1,0 +1,54 @@
+﻿@model IEnumerable<FitnessClubManagement.Models.Booking>
+@{
+    ViewData["Title"] = "My Dashboard";
+}
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <h2 class="fw-bold text-uppercase m-0">MY BOOKED SESSIONS</h2>
+        <a asp-controller="Home" asp-action="Schedule" class="btn btn-outline-light text-nowrap">BROWSE SCHEDULE</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success" style="background: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40, 167, 69, 0.4); color: #51cf66;">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="glass-panel text-center p-5">
+            <h4 class="text-secondary">NO SECURED SPOTS</h4>
+            <p class="text-white-50">You have not booked any upcoming sessions. Browse the schedule to claim your spot.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var booking in Model)
+            {
+                <div class="col-md-6">
+                    <div class="glass-panel d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 p-4" style="border-left: 4px solid var(--accent-liquid);">
+                        <div>
+                            <div class="panel-icon mb-2" style="width: 45px; height: 45px; font-size: 1.5rem;">🥊</div>
+                            <h4 class="fw-bold text-white text-uppercase m-0">@booking.Workout!.Title</h4>
+                            <div class="text-secondary small mt-1">TRAINER: @booking.Workout.TrainerName</div>
+                            <div class="text-white mt-2">
+                                @booking.Workout.ScheduledTime.ToString("MMM dd, yyyy") | <span class="fw-bold">@booking.Workout.ScheduledTime.ToString("HH:mm")</span>
+                            </div>
+                        </div>
+
+                        <div class="text-md-end flex-shrink-0">
+                            <span class="glass-tag d-block mb-3 text-center" style="background: rgba(40, 167, 69, 0.1); color: #51cf66; border-color: rgba(40, 167, 69, 0.3);">SPOT SECURED</span>
+                            <form asp-action="CancelBooking" method="post">
+                                <input type="hidden" name="bookingId" value="@booking.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger w-100">CANCEL</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
