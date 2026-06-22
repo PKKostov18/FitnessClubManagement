@@ -40,11 +40,11 @@
                         </div>
 
                         @{
-                            // Вземаме списъка с ID-та от контролера
+                            // We get the list of IDs from the controller
                             var userBookings = ViewBag.UserBookings as List<int> ?? new List<int>();
                             bool hasUserBooked = userBookings.Contains(workout.Id);
 
-                            // Намираме конкретното ID на резервацията (ако иска да я отмени)
+                            // We find the specific reservation ID (if he wants to cancel it)
                             int? currentBookingId = workout.Bookings.FirstOrDefault(b => b.UserId.ToString() == User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier))?.Id;
                         }
 

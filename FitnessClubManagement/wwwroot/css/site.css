@@ -15,31 +15,26 @@
     color: var(--text-gray) !important;
 }
 
-/* --- 1. ГЛОБАЛЕН ЛЕЙАУТ, ТЕКСТУРА И ФИКС ЗА ФУТЪРА --- */
 html, body {
     background-color: var(--bg-dark);
-    /* Добавяме тактическата решетка глобално на всички страници */
-    background-image: linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
     background-size: 55px 55px;
-    background-attachment: fixed; /* Решетката не мърда при скролване */
+    background-attachment: fixed;
 
     color: var(--text-main);
     font-family: 'Inter', 'Helvetica Neue', sans-serif;
     margin: 0;
     padding: 0;
-    /* Flexbox настройки, които избутват футъра винаги най-долу */
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     letter-spacing: -0.2px;
 }
 
-/* Това разширява главното съдържание и държи футъра на дъното */
 main {
     flex: 1;
 }
 
-/* --- 2. НАВИГАЦИЯ --- */
 .navbar {
     background-color: var(--bg-dark) !important;
     border-bottom: 1px solid var(--border-color);
@@ -70,7 +65,6 @@ main {
         color: var(--text-main) !important;
     }
 
-/* --- 3. БУТОНИ И ЗАМЕСТИТЕЛИ ЗА СТАРИТЕ LIQUID БУТОНИ --- */
 .btn-combat, .btn-liquid-primary {
     display: inline-block;
     background-color: var(--accent-red) !important;
@@ -80,7 +74,7 @@ main {
     letter-spacing: 1.5px !important;
     padding: 1rem 2.5rem !important;
     border: none !important;
-    border-radius: 0 !important; /* ОСТРИ ЪГЛИ (Брутализъм) */
+    border-radius: 0 !important;
     transition: all 0.3s ease !important;
     text-decoration: none;
     text-align: center;
@@ -107,7 +101,6 @@ main {
     text-decoration: none;
 }
 
-/* Специфично за малки бутони като CANCEL */
 .btn-sm {
     padding: 0.5rem 1rem !important;
     font-size: 0.8rem !important;
@@ -123,20 +116,19 @@ main {
     border-color: var(--accent-red) !important;
 }
 
-    .btn-outline-danger:hover {
-        background-color: var(--accent-red) !important;
-        color: #fff !important;
-    }
+.btn-outline-danger:hover {
+    background-color: var(--accent-red) !important;
+    color: #fff !important;
+}
 
-/* --- 4. КАРТИ ЗА ТРЕНИРОВКИ И ЗАМЕСТИТЕЛИ ЗА GLASS-PANEL --- */
 .combat-card, .glass-panel {
     background-color: var(--surface-dark) !important;
     border: 1px solid var(--border-color) !important;
     padding: 2.5rem 2rem;
     height: 100%;
     transition: border-color 0.3s ease !important;
-    border-radius: 0 !important; /* Премахва старите заобляния */
-    backdrop-filter: none !important; /* Спира ефекта на стъкло */
+    border-radius: 0 !important;
+    backdrop-filter: none !important;
     box-shadow: none !important;
 }
 
@@ -156,7 +148,6 @@ main {
     display: block !important;
 }
 
-/* --- 5. ТАБЛИЦИ И ДАШБОРДИ (Admin & Roster) --- */
 .table-dark {
     background-color: transparent !important;
     --bs-table-bg: transparent;
@@ -164,34 +155,33 @@ main {
     margin-top: 1rem;
 }
 
-    .table-dark thead {
-        background-color: var(--bg-dark);
-    }
+.table-dark thead {
+    background-color: var(--bg-dark);
+}
 
-        .table-dark thead th {
-            border-bottom: 2px solid var(--accent-red) !important;
-            color: var(--text-gray) !important;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-            padding: 1.5rem 1rem;
-            border-top: none !important;
-        }
+.table-dark thead th {
+    border-bottom: 2px solid var(--accent-red) !important;
+    color: var(--text-gray) !important;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    padding: 1.5rem 1rem;
+    border-top: none !important;
+}
 
-    .table-dark tbody td {
-        background-color: var(--surface-dark) !important;
-        border-bottom: 1px solid var(--border-color) !important;
-        color: var(--text-main) !important;
-        padding: 1.5rem 1rem;
-        vertical-align: middle;
-    }
+.table-dark tbody td {
+    background-color: var(--surface-dark) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    color: var(--text-main) !important;
+    padding: 1.5rem 1rem;
+    vertical-align: middle;
+}
 
-    .table-dark tbody tr:hover td {
-        background-color: rgba(255, 255, 255, 0.03) !important;
-        border-bottom-color: var(--text-main) !important;
-    }
+.table-dark tbody tr:hover td {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    border-bottom-color: var(--text-main) !important;
+}
 
-/* --- 6. БАДЖОВЕ, ЕТИКЕТИ И ФОРМИ --- */
 .status-badge, .glass-tag, .badge {
     display: inline-block;
     padding: 0.4rem 1rem !important;
@@ -202,7 +192,7 @@ main {
     background-color: var(--bg-dark) !important;
     border: 1px solid var(--border-color) !important;
     color: var(--text-gray) !important;
-    border-radius: 0 !important; /* Остри ъгли */
+    border-radius: 0 !important;
 }
 
     .status-badge.active, .bg-danger, .badge.bg-danger {
@@ -210,7 +200,6 @@ main {
         border-color: rgba(218, 18, 18, 0.5) !important;
     }
 
-/* Презаписваме полетата за писане (Login / Forms) */
 .form-control {
     background-color: var(--surface-dark) !important;
     border: 1px solid var(--border-color) !important;
@@ -224,7 +213,6 @@ main {
         box-shadow: none !important;
     }
 
-/* Квадратни Progress Bars */
 .progress {
     background-color: var(--bg-dark) !important;
     border-radius: 0 !important;
@@ -236,7 +224,6 @@ main {
     background-color: var(--accent-red) !important;
 }
 
-/* --- 7. HERO СЕКЦИЯ (Само за Main Page) --- */
 .hero-wrapper {
     padding: 6rem 0 8rem 0;
     border-bottom: 1px solid var(--border-color);

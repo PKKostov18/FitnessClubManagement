@@ -4,10 +4,11 @@ using System.Security.Cryptography;
 using System.Text;
 using FitnessClubManagement.Models;
 using FitnessClubManagement.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace FitnessClubManagement.Controllers
 {
-    // STRICT SECURITY: Only users with the "Admin" role can access any action in this controller.
+    // STRICT SECURITY
     [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
@@ -29,53 +30,83 @@ namespace FitnessClubManagement.Controllers
         }
 
         // GET: /Admin/Index
-        // Displays the main command center and a list of all users
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            // Fetch all users from the database to display in the dashboard
-            var allUsers = _context.Users.ToList();
+            var now = DateTime.Now;
+            var allUsers = await _context.Users.ToListAsync();
+
+            ViewBag.TotalFighters = allUsers.Count(u => u.Role != "Admin" && u.Role != "Trainer");
+            ViewBag.ActiveTrainers = allUsers.Count(u => u.Role == "Trainer");
+            ViewBag.DeployedSessions = await _context.Workouts.CountAsync(w => w.ScheduledTime >= now);
+            ViewBag.GlobalRosterLoad = await _context.Bookings.CountAsync(b => b.Workout!.ScheduledTime >= now);
+
             return View(allUsers);
         }
 
         // GET: /Admin/AddTrainer
-        // Loads the form to add a new trainer
         public IActionResult AddTrainer()
         {
             return View();
         }
 
         // POST: /Admin/AddTrainer
-        // Processes the submitted form
         [HttpPost]
         public async Task<IActionResult> AddTrainer(AddTrainerViewModel model)
         {
             if (ModelState.IsValid)
             {
-                // Check if the email is already taken
                 if (_context.Users.Any(u => u.Email == model.Email))
                 {
                     ModelState.AddModelError("Email", "This email is already in use by another user.");
                     return View(model);
                 }
 
-                // Create the new Trainer entity
                 var trainer = new User
                 {
                     Username = model.Username,
                     Email = model.Email,
                     PasswordHash = HashPassword(model.Password),
-                    Role = "Trainer" // Hardcoding the role specifically for this action
+                    Role = "Trainer"
                 };
 
                 _context.Users.Add(trainer);
                 await _context.SaveChangesAsync();
 
-                // Redirect back to the dashboard after successful creation
+                TempData["SuccessMessage"] = $"Trainer {model.Username} successfully deployed to the platform.";
                 return RedirectToAction("Index");
             }
 
-            // If validation fails, return the form with error messages
             return View(model);
+        }
+
+        // POST: /Admin/ChangeRole
+        [HttpPost]
+        public async Task<IActionResult> ChangeRole(int userId, string newRole)
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user != null && user.Role != "Admin")
+            {
+                user.Role = newRole;
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = $"Role for {user.Username} successfully updated to {newRole.ToUpper()}.";
+            }
+            return RedirectToAction("Index");
+        }
+
+        // POST: /Admin/DeleteUser
+        [HttpPost]
+        public async Task<IActionResult> DeleteUser(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user != null && user.Role != "Admin")
+            {
+                _context.Users.Remove(user);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "System account explicitly terminated and purged from database layers.";
+            }
+            return RedirectToAction("Index");
         }
     }
 }

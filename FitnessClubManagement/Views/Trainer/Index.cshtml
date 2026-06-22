@@ -45,7 +45,7 @@
                 // Calculate dynamic states
                 int currentBookings = workout.Bookings.Count;
                 bool isFull = currentBookings >= workout.Capacity;
-                bool isPast = workout.ScheduledTime < DateTime.Now; // NEW: Check if the session is over
+                bool isPast = workout.ScheduledTime < DateTime.Now; // Check if the session is over
 
                 <div class="col-md-4">
                     <div class="glass-panel h-100 d-flex flex-column justify-content-between p-4"

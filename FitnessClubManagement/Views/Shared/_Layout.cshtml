@@ -23,28 +23,49 @@
                 </button>
 
                 <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
-                    <ul class="navbar-nav mx-auto gap-4">
-                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Dashboard</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Schedule">Schedule</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Sparring</a></li>
-                    </ul>
 
-                    <div class="nav-auth d-flex align-items-center gap-3 mt-3 mt-md-0">
+                    <!-- DYNAMIC NAVIGATION -->
+                    <ul class="navbar-nav mx-auto gap-4">
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            @if (User.IsInRole("Admin"))
+                            if (User.IsInRole("Admin"))
                             {
-                                <a asp-controller="Admin" asp-action="Index" class="nav-link text-warning fw-bold">SYS ADMIN</a>
+                                <!-- (Admin) -->
+                                <li class="nav-item"><a class="nav-link text-warning" asp-controller="Admin" asp-action="Index">SYSTEM ROSTER</a></li>
                             }
                             else if (User.IsInRole("Trainer"))
                             {
-                                <a asp-controller="Trainer" asp-action="Index" class="nav-link text-danger fw-bold text-nowrap">TRAINER HQ</a>
+                                <!-- (Trainer) -->
+                                <li class="nav-item"><a class="nav-link text-white" asp-controller="Trainer" asp-action="Profile">MY PROFILE</a></li>
+                                <li class="nav-item"><a class="nav-link text-danger" asp-controller="Trainer" asp-action="Index">TRAINER HQ</a></li>
+                                <li class="nav-item"><a class="nav-link" asp-controller="Trainer" asp-action="AddWorkout">DEPLOY SESSION</a></li>
                             }
                             else
                             {
-                                <a asp-controller="User" asp-action="Dashboard" class="nav-link text-white fw-bold text-nowrap">MY ROSTER</a>
+                                <!-- (Fighter) -->
+                                <li class="nav-item"><a class="nav-link text-white" asp-controller="User" asp-action="Profile">MY PROFILE</a></li>
+                                <li class="nav-item"><a class="nav-link text-white" asp-controller="User" asp-action="Dashboard">MY DASHBOARD</a></li>
+                                <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Schedule">GLOBAL SCHEDULE</a></li>
+                                <li class="nav-item">
+                                    <a class="nav-link d-flex align-items-center gap-2" asp-controller="User" asp-action="Sparring">
+                                        SPARRING
+                                        <span id="globalUnreadBadge" class="badge bg-danger rounded-0" style="display: none; font-size: 0.7rem;">0</span>
+                                    </a>
+                                </li>
                             }
+                        }
+                        else
+                        {
+                            <!-- GUEST -->
+                            <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">HOME</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Schedule">SCHEDULE</a></li>
+                        }
+                    </ul>
 
+                    <!-- LOGIN AND LOGOUT -->
+                    <div class="nav-auth d-flex align-items-center gap-3 mt-3 mt-md-0">
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
                             <a asp-controller="Account" asp-action="Logout" class="btn-combat-outline" style="padding: 0.5rem 1.5rem; font-size: 0.8rem;">
                                 LOGOUT
                             </a>
@@ -89,6 +110,30 @@
         }, 500);
         });
         }, 2000);
+        });
+    </script>
+
+    <script>
+        function pingComms() {
+        var badge = document.getElementById('globalUnreadBadge');
+        if (!badge) return;
+
+        fetch('/User/GetUnreadMessageCount')
+        .then(response => response.json())
+        .then(count => {
+        if (count > 0) {
+        badge.innerText = count;
+        badge.style.display = 'inline-block';
+        } else {
+        badge.style.display = 'none';
+        }
+        })
+        .catch(err => console.error("Comms ping failed", err));
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+        pingComms();
+        setInterval(pingComms, 5000);
         });
     </script>
 </body>

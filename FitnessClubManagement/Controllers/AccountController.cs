@@ -40,7 +40,6 @@ namespace FitnessClubManagement.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Check if the email is already taken
                 if (_context.Users.Any(u => u.Email == model.Email))
                 {
                     ModelState.AddModelError("Email", "This email is already registered.");
@@ -80,7 +79,6 @@ namespace FitnessClubManagement.Controllers
 
                 if (user != null)
                 {
-                    // Create claims (the user's digital ID card)
                     var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Name, user.Username),
@@ -91,21 +89,18 @@ namespace FitnessClubManagement.Controllers
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-                    // 1. Define explicit session properties (strictly non-persistent)
                     var authProperties = new AuthenticationProperties
                     {
-                        IsPersistent = false, // Tells the browser NOT to save this cookie to the hard drive
-                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30), // Session automatically expires after 30 minutes of inactivity
+                        IsPersistent = false,
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30),
                         AllowRefresh = true
                     };
 
-                    // 2. Sign in the user securely WITH the authProperties
                     await HttpContext.SignInAsync(
                         CookieAuthenticationDefaults.AuthenticationScheme,
                         new ClaimsPrincipal(claimsIdentity),
-                        authProperties); // <-- This is the crucial part that was missing!
+                        authProperties);
 
-                    // --- SMART ROLE-BASED REDIRECT ---
                     if (user.Role == "Admin")
                     {
                         return RedirectToAction("Index", "Admin");

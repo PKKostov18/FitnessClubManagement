@@ -1,0 +1,74 @@
+﻿@model IEnumerable<FitnessClubManagement.Models.ChatMessage>
+@{
+    var receiver = ViewBag.Receiver as FitnessClubManagement.Models.User;
+    ViewData["Title"] = $"Chat with {receiver?.Username}";
+    int currentUserId = ViewBag.CurrentUserId;
+}
+
+<div class="container py-5 mt-4">
+    <div class="mb-4">
+        <a asp-action="Sparring" class="text-gray text-decoration-none fw-bold small" style="letter-spacing: 1px;">
+            ← BACK TO FIGHTER RADAR
+        </a>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3" style="border-bottom: 1px solid var(--border-color);">
+        <div>
+            <h3 class="fw-bold text-uppercase m-0" style="letter-spacing: -1px;">SECURE CHANNEL: @receiver?.Username</h3>
+            <p class="text-gray small mb-0">Target Parameters: @receiver?.Discipline // @receiver?.WeightClass</p>
+        </div>
+        <span class="status-badge active border-success text-success">ENCRYPTED COMMS</span>
+    </div>
+
+    <div class="combat-card p-0 d-flex flex-column" style="height: 55vh; background-color: var(--surface-dark);">
+
+        <div class="p-4 flex-grow-1 overflow-y-auto d-flex flex-column gap-3" id="chatWindow" style="background-image: linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px); background-size: 30px 30px;">
+            @if (!Model.Any())
+            {
+                <div class="text-center text-gray my-auto small text-uppercase fw-bold" style="letter-spacing: 2px;">
+                    [ Connection established. Send a sparring dispatch. ]
+                </div>
+            }
+            else
+            {
+                @foreach (var msg in Model)
+                {
+                    bool isMe = msg.SenderId == currentUserId;
+
+                    <div class="d-flex flex-column @(isMe ? "align-items-end" : "align-items-start")">
+                        <div class="p-3" style="max-width: 70%; border: 1px solid var(--border-color);
+                            background-color: @(isMe ? "rgba(218, 18, 18, 0.15)" : "var(--bg-dark)");
+                            border-left: @(isMe ? "none" : "3px solid var(--text-gray)");
+                            border-right: @(isMe ? "3px solid var(--accent-red)" : "none");">
+                            <p class="m-0 text-white" style="font-size: 0.95rem; word-break: break-word;">@msg.Content</p>
+                        </div>
+                        <span class="text-gray mt-1" style="font-size: 0.7rem; font-weight: 600;">
+                            @msg.Timestamp.ToString("HH:mm")
+                        </span>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="p-3" style="border-top: 1px solid var(--border-color); background-color: var(--bg-dark);">
+            <form asp-action="SendMessage" method="post" class="d-flex gap-2">
+                <input type="hidden" name="receiverId" value="@receiver?.Id" />
+                <input type="text" name="content" placeholder="TYPE COMBAT PROTOCOL DISPATCH..." autocomplete="off" autofocus
+                       class="form-control flex-grow-1 px-4 py-3 text-uppercase" style="background-color: var(--surface-dark) !important;" />
+                <button type="submit" class="btn-combat px-4 fw-bold" style="padding: 0 2rem;">SEND</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var chatWindow = document.getElementById("chatWindow");
+            if (chatWindow) {
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+        });
+    </script>
+}

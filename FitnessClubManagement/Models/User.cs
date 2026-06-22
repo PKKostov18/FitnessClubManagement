@@ -23,6 +23,10 @@ public partial class User
 
     public int? TargetWaterMl { get; set; }
 
+    public string? Discipline { get; set; }
+    public string? WeightClass { get; set; }
+    public bool IsAvailableForSparring { get; set; }
+
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
     public virtual ICollection<NutritionLog> NutritionLogs { get; set; } = new List<NutritionLog>();

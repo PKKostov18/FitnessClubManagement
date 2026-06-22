@@ -6,7 +6,7 @@ using FitnessClubManagement.Models;
 
 namespace FitnessClubManagement.Controllers
 {
-    // STRICT SECURITY: Must be logged in to access anything in this controller
+    // STRICT SECURITY
     [Authorize]
     public class UserController : Controller
     {
@@ -17,7 +17,6 @@ namespace FitnessClubManagement.Controllers
             _context = context;
         }
 
-        // Helper method to securely get the logged-in user's ID
         private int GetCurrentUserId()
         {
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -29,7 +28,6 @@ namespace FitnessClubManagement.Controllers
         {
             int userId = GetCurrentUserId();
 
-            // Fetch only the future bookings belonging to this specific user
             var myBookings = await _context.Bookings
                 .Include(b => b.Workout)
                 .Where(b => b.UserId == userId && b.Workout!.ScheduledTime > DateTime.Now)
@@ -45,7 +43,6 @@ namespace FitnessClubManagement.Controllers
         {
             int userId = GetCurrentUserId();
 
-            // 1. Check if the user already booked this session
             bool alreadyBooked = await _context.Bookings.AnyAsync(b => b.WorkoutId == workoutId && b.UserId == userId);
             if (alreadyBooked)
             {
@@ -53,7 +50,6 @@ namespace FitnessClubManagement.Controllers
                 return RedirectToAction("Schedule", "Home");
             }
 
-            // 2. Fetch the workout and check capacity
             var workout = await _context.Workouts.Include(w => w.Bookings).FirstOrDefaultAsync(w => w.Id == workoutId);
             if (workout == null) return NotFound();
 
@@ -63,7 +59,6 @@ namespace FitnessClubManagement.Controllers
                 return RedirectToAction("Schedule", "Home");
             }
 
-            // 3. Create the booking
             var booking = new Booking
             {
                 UserId = userId,
@@ -93,6 +88,142 @@ namespace FitnessClubManagement.Controllers
             }
 
             return RedirectToAction("Dashboard");
+        }
+
+        // GET: /User/Sparring
+        public async Task<IActionResult> Sparring()
+        {
+            int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+            var currentUser = await _context.Users.FindAsync(currentUserId);
+
+            var availableFighters = await _context.Users
+                .Where(u => u.Role == "User" && u.Id != currentUserId && u.IsAvailableForSparring)
+                .ToListAsync();
+
+            var unreadCounts = await _context.ChatMessages
+                .Where(m => m.ReceiverId == currentUserId && !m.IsRead)
+                .GroupBy(m => m.SenderId)
+                .Select(g => new { SenderId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.SenderId, x => x.Count);
+
+            ViewBag.CurrentUser = currentUser;
+            ViewBag.UnreadCounts = unreadCounts;
+
+            return View(availableFighters);
+        }
+
+        // POST: /User/UpdateSparringProfile
+        [HttpPost]
+        public async Task<IActionResult> UpdateSparringProfile(string discipline, string weightClass, string experience, bool isAvailable)
+        {
+            int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+            var user = await _context.Users.FindAsync(currentUserId);
+
+            if (user != null)
+            {
+                user.Discipline = discipline;
+                user.WeightClass = weightClass;
+                user.ExperienceLevel = experience;
+                user.IsAvailableForSparring = isAvailable;
+
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Combat protocol updated. Matchmaking parameters saved and synchronized.";
+            }
+
+            return RedirectToAction("Sparring");
+        }
+
+        // GET: /User/Chat
+        public async Task<IActionResult> Chat(int receiverId)
+        {
+            int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+            var receiver = await _context.Users.FindAsync(receiverId);
+            if (receiver == null) return RedirectToAction("Sparring");
+
+            var messages = await _context.ChatMessages
+                .Include(m => m.Sender)
+                .Where(m => (m.SenderId == currentUserId && m.ReceiverId == receiverId) ||
+                            (m.SenderId == receiverId && m.ReceiverId == currentUserId))
+                .OrderBy(m => m.Timestamp)
+                .ToListAsync();
+
+            var unreadMessages = messages.Where(m => m.ReceiverId == currentUserId && m.SenderId == receiverId && !m.IsRead).ToList();
+            if (unreadMessages.Any())
+            {
+                unreadMessages.ForEach(m => m.IsRead = true);
+                await _context.SaveChangesAsync();
+            }
+
+            ViewBag.Receiver = receiver;
+            ViewBag.CurrentUserId = currentUserId;
+
+            return View(messages);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUnreadMessageCount()
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdStr)) return Json(0);
+
+            int currentUserId = int.Parse(userIdStr);
+            var count = await _context.ChatMessages.CountAsync(m => m.ReceiverId == currentUserId && !m.IsRead);
+
+            return Json(count);
+        }
+
+        // POST: /User/SendMessage
+        [HttpPost]
+        public async Task<IActionResult> SendMessage(int receiverId, string content)
+        {
+            if (string.IsNullOrWhiteSpace(content)) return RedirectToAction("Chat", new { receiverId });
+
+            int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+
+            var message = new ChatMessage
+            {
+                SenderId = currentUserId,
+                ReceiverId = receiverId,
+                Content = content.Trim(),
+                Timestamp = DateTime.Now
+            };
+
+            _context.ChatMessages.Add(message);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Chat", new { receiverId });
+        }
+
+        // GET: /[Controller]/Profile
+        public async Task<IActionResult> Profile()
+        {
+            int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+            var user = await _context.Users.FindAsync(currentUserId);
+
+            if (user == null) return NotFound();
+
+            return View(user);
+        }
+
+        // POST: /[Controller]/UpdateProfile
+        [HttpPost]
+        public async Task<IActionResult> UpdateProfile(string username, string email, decimal? weightKgs)
+        {
+            int currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+            var user = await _context.Users.FindAsync(currentUserId);
+
+            if (user != null)
+            {
+                user.Username = username;
+                user.Email = email;
+
+                user.WeightKgs = weightKgs;
+
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Operative parameters successfully updated and synchronized.";
+            }
+
+            return RedirectToAction("Profile");
         }
     }
 }

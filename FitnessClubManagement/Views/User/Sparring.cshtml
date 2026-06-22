@@ -1,0 +1,124 @@
+﻿@model IEnumerable<FitnessClubManagement.Models.User>
+@{
+    ViewData["Title"] = "Sparring Matchmaking";
+    var currentUser = ViewBag.CurrentUser as FitnessClubManagement.Models.User;
+}
+
+<div class="container py-5 mt-4">
+    <div class="d-flex justify-content-between align-items-end mb-5 flex-wrap gap-3">
+        <div>
+            <h2 class="fw-bold text-uppercase m-0" style="font-size: 2.5rem; letter-spacing: -1px;">SPARRING MATCHMAKING</h2>
+            <p class="text-gray mb-0">Update your combat parameters and chart available training partners.</p>
+        </div>
+        <span class="status-badge active border-info text-info">P2P ENGINE ACTIVE</span>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success rounded-0 border-0 mb-4" style="background-color: rgba(40, 167, 69, 0.1); border-left: 4px solid #28a745 !important; color: #28a745;">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="row g-5">
+
+        <div class="col-lg-4">
+            <div class="combat-card p-4" style="border-top: 4px solid var(--accent-red); position: sticky; top: 100px;">
+                <h4 class="fw-bold text-uppercase mb-4">MY COMBAT PROFILE</h4>
+
+                <form asp-action="UpdateSparringProfile" method="post">
+                    <div class="mb-4">
+                        <label class="text-gray small fw-bold mb-2">PRIMARY DISCIPLINE</label>
+                        <select name="discipline" class="form-control text-uppercase small">
+                            <option value="MMA" selected="@(currentUser?.Discipline == "MMA")">Mixed Martial Arts</option>
+                            <option value="Boxing" selected="@(currentUser?.Discipline == "Boxing")">Boxing & Striking</option>
+                            <option value="BJJ" selected="@(currentUser?.Discipline == "BJJ")">Brazilian Jiu-Jitsu</option>
+                            <option value="Muay Thai" selected="@(currentUser?.Discipline == "Muay Thai")">Muay Thai</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-gray small fw-bold mb-2">WEIGHT CLASS</label>
+                        <select name="weightClass" class="form-control text-uppercase small">
+                            <option value="Featherweight (65kg)" selected="@(currentUser?.WeightClass == "Featherweight (65kg)")">Featherweight (65kg)</option>
+                            <option value="Lightweight (70kg)" selected="@(currentUser?.WeightClass == "Lightweight (70kg)")">Lightweight (70kg)</option>
+                            <option value="Welterweight (77kg)" selected="@(currentUser?.WeightClass == "Welterweight (77kg)")">Welterweight (77kg)</option>
+                            <option value="Middleweight (84kg)" selected="@(currentUser?.WeightClass == "Middleweight (84kg)")">Middleweight (84kg)</option>
+                            <option value="Heavyweight (100kg+)" selected="@(currentUser?.WeightClass == "Heavyweight (100kg+)")">Heavyweight (100kg+)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-gray small fw-bold mb-2">EXPERIENCE LEVEL</label>
+                        <select name="experience" class="form-control text-uppercase small">
+                            <option value="Beginner" selected="@(currentUser?.ExperienceLevel == "Beginner")">Beginner (< 1 Year)</option>
+                            <option value="Amateur" selected="@(currentUser?.ExperienceLevel == "Amateur")">Amateur (1-3 Years)</option>
+                            <option value="Pro" selected="@(currentUser?.ExperienceLevel == "Pro")">Professional (3+ Years)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-5 p-3" style="background: var(--bg-dark); border: 1px solid var(--border-color);">
+                        <div class="form-check form-switch d-flex align-items-center gap-3 p-0 m-0">
+                            <input class="form-check-input m-0" type="checkbox" role="switch" name="isAvailable" value="true" @(currentUser?.IsAvailableForSparring == true ? "checked" : "") style="width: 2.5rem; height: 1.25rem;">
+                            <label class="form-check-label text-white fw-bold text-uppercase small m-0" style="letter-spacing: 1px;">Ready for Sparring</label>
+                        </div>
+                        <p class="text-gray small mt-2 m-0" style="font-size: 0.75rem;">Enable this to broadcast your profile to other active fighters in the facility.</p>
+                    </div>
+
+                    <button type="submit" class="btn-combat w-100">SYNC PROTOCOL</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <h4 class="fw-bold text-uppercase mb-4">ACTIVE FIGHTER RADAR</h4>
+
+            @if (!Model.Any())
+            {
+                <div class="glass-panel text-center py-5" style="border-style: dashed;">
+                    <div class="text-gray mb-2" style="font-size: 2rem;">📡</div>
+                    <h5 class="fw-bold text-white text-uppercase">Radar Clear</h5>
+                    <p class="text-gray mb-0">No active fighters found matching criteria. Update your availability to be seen.</p>
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var fighter in Model)
+                    {
+                        // We check if there are any messages from this particular fighter in the unread dictionary
+                        var unreadCounts = ViewBag.UnreadCounts as Dictionary<int, int>;
+                        int unreadFromFighter = unreadCounts != null && unreadCounts.ContainsKey(fighter.Id) ? unreadCounts[fighter.Id] : 0;
+
+                        <div class="col-md-6">
+                            <div class="combat-card p-4 @(unreadFromFighter > 0 ? "border-danger" : "")" style="@(unreadFromFighter > 0 ? "border: 1px solid var(--accent-red);" : "")">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h4 class="fw-bold text-white text-uppercase m-0">
+                                        @fighter.Username
+                                        @if (unreadFromFighter > 0)
+                                        {
+                                            <span class="badge bg-danger rounded-0 ms-2" style="font-size: 0.7rem; vertical-align: middle;">@unreadFromFighter NEW</span>
+                                        }
+                                    </h4>
+                                    <span class="badge rounded-0" style="background: rgba(13, 202, 240, 0.1); color: #0dcaf0; border: 1px solid rgba(13, 202, 240, 0.3);">ONLINE</span>
+                                </div>
+
+                                <ul class="list-unstyled text-gray small mb-4">
+                                    <li class="mb-2"><strong class="text-white">DISCIPLINE:</strong> @fighter.Discipline</li>
+                                    <li class="mb-2"><strong class="text-white">WEIGHT:</strong> @fighter.WeightClass</li>
+                                    <li class="mb-0"><strong class="text-white">EXPERIENCE:</strong> @fighter.ExperienceLevel</li>
+                                </ul>
+
+                                <a asp-action="Chat" asp-route-receiverId="@fighter.Id"
+                                   class="@(unreadFromFighter > 0 ? "btn-combat" : "btn-combat-outline") w-100 text-center" style="padding: 0.8rem; font-size: 0.85rem;">
+                                    @(unreadFromFighter > 0 ? "READ TRANSMISSION" : "OPEN SECURE CHAT")
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
